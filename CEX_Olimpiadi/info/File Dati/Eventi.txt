@@ -1,5 +1,6 @@
 id;evento;anno;luogo
 1;Olimpiadi;2021;Tokyo
+2;Olimpiadi;2024;Parigi
 3;Olimpiadi;1948;Londra
 4;Olimpiadi;1996;Atlanta
 5;Mondiali di Nuoto;2023;Fukuoka

@@ -5,6 +5,7 @@ id;gara;categoria;indoor;squadra
 4;100 metri;Atletica Leggera;0;0
 5;50 metri Farfalla;Nuoto;1;0
 6;Anelli;Ginnastica;1;0
+7;Pallavolo;Sport di Squadra;1;1
 8;Tiro al Piattello;Armi da Fuoco;0;1
 9;Staffetta;Atletica Leggera;0;1
 10;200 metri;Atletica Leggera;0;0

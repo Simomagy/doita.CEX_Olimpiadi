@@ -18,4 +18,3 @@
 18;Gwendolyn;Fairfax;1970-07-14;Germania
 19;Hector;Van Helsing;1983-11-05;Paesi Bassi
 20;Isolde;Avalon;1994-09-09;Svizzera
-
