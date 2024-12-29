@@ -21,14 +21,13 @@ namespace CEX_Olimpiadi.DAO_Classes;
 
 public class DaoAthletes : IDAO
 {
-    private const string TableName = "Athletes";
-
     /// <inheritdoc />
     public List<Entity> GetRecords()
     {
-        const string query = $"SELECT * FROM {TableName}";
+        const string query = $"SELECT * FROM Athletes";
+        var parameters = new Dictionary<string, object>();
         List<Entity> athletesRecords = [];
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return athletesRecords;
         foreach (var singleResponse in fullResponse)
@@ -44,41 +43,49 @@ public class DaoAthletes : IDAO
     /// <inheritdoc />
     public bool CreateRecord(Entity entity)
     {
-        var name = ((Athlete)entity).Name.Replace("'", "''");
-        var surname = ((Athlete)entity).Surname.Replace("'", "''");
-        var dob = ((Athlete)entity).Dob.ToString("yyyy-MM-dd");
-        var country = ((Athlete)entity).Country.Replace("'", "''");
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Name", ((Athlete)entity).Name.Replace("'", "''") },
+            { "@Surname", ((Athlete)entity).Surname.Replace("'", "''") },
+            { "@Dob", ((Athlete)entity).Dob },
+            { "@Country", ((Athlete)entity).Country.Replace("'", "''") }
+        };
         var query =
-            $"INSERT INTO {TableName} (Name, Surname, Dob, Country) VALUES ('{name}', '{surname}', '{dob}', '{country}')";
+            $"INSERT INTO Athletes (Name, Surname, Dob, Country) VALUES (@Name, @Surname, @Dob, @Country)";
 
-        return _db.UpdateDb(query);
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
-        var name = ((Athlete)entity).Name.Replace("'", "''");
-        var surname = ((Athlete)entity).Surname.Replace("'", "''");
-        var dob = ((Athlete)entity).Dob.ToString("yyyy-MM-dd");
-        var country = ((Athlete)entity).Country.Replace("'", "''");
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Name", ((Athlete)entity).Name.Replace("'", "''") },
+            { "@Surname", ((Athlete)entity).Surname.Replace("'", "''") },
+            { "@Dob", ((Athlete)entity).Dob },
+            { "@Country", ((Athlete)entity).Country.Replace("'", "''") }
+        };
         var query =
-            $"UPDATE {TableName} SET Name = '{name}', Surname = '{surname}', Dob = '{dob}', Country = '{country}' WHERE Id = {entity.Id}";
+            $"UPDATE Athletes SET Name = @Name, Surname = @Surname, Dob = @Dob, Country = @Country WHERE Id = {entity.Id}";
 
-        return _db.UpdateDb(query);
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM {TableName} WHERE Id = {recordId}";
-        return _db.UpdateDb(query);
+        var query = $"DELETE FROM Athletes WHERE Id = @Id";
+        var parameters = new Dictionary<string, object>();
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Id = {recordId}";
-        var singleResponse = _db.ReadOneDb(query);
+        var query = $"SELECT * FROM Athletes WHERE Id = @Id";
+        var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return null;
         Entity entity = new Athlete();
@@ -88,8 +95,13 @@ public class DaoAthletes : IDAO
 
     public Entity? GetAthleteByFullName(string name, string surname)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Name = '{name}' AND Surname = '{surname}'";
-        var singleResponse = _db.ReadOneDb(query);
+        var query = $"SELECT * FROM Athletes WHERE Name = @Name AND Surname = @Surname";
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Name", name },
+            { "@Surname", surname }
+        };
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return null;
         Entity entity = new Athlete();
@@ -100,8 +112,13 @@ public class DaoAthletes : IDAO
 
     public int GetAthleteIdByFullName(string name, string surname)
     {
-        var query = $"SELECT Id FROM {TableName} WHERE Name = '{name}' AND Surname = '{surname}'";
-        var singleResponse = _db.ReadOneDb(query);
+        var query = $"SELECT Id FROM Athletes WHERE Name = @Name AND Surname = @Surname";
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Name", name },
+            { "@Surname", surname }
+        };
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return -1;
         // Accedi al valore tramite la chiave
@@ -110,9 +127,10 @@ public class DaoAthletes : IDAO
 
     public List<Athlete> GetAthletesByCountry(string country)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Country = '{country}'";
+        var query = $"SELECT * FROM Athletes WHERE Country = @Country";
+        var parameters = new Dictionary<string, object> { { "@Country", country } };
         List<Athlete> athletes = [];
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return athletes;
         foreach (var singleResponse in fullResponse)
@@ -127,23 +145,24 @@ public class DaoAthletes : IDAO
 
     public Athlete GetOldestGoldWinner()
     {
-        var query = @"
+        const string query = @"
             SELECT TOP 1
                 Athletes.Id, 
                 Athletes.Name, 
                 Athletes.Surname, 
                 Athletes.Dob, 
                 Athletes.Country, 
-                Medals.MedalTier 
+                Medals.MedalTier
             FROM 
-                Athletes 
+                Athletes
                 JOIN Medals ON Athletes.Id = Medals.AthleteId 
             WHERE 
                 Medals.MedalTier = 'Oro' 
             ORDER BY 
                 Athletes.Dob ASC 
             ";
-        var singleResponse = _db.ReadOneDb(query);
+        var parameters = new Dictionary<string, object>();
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return new Athlete();
         Entity entity = new Athlete();

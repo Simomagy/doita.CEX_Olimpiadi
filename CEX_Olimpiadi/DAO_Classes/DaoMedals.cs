@@ -21,14 +21,13 @@ namespace CEX_Olimpiadi.DAO_Classes;
 
 public class DaoMedals : IDAO
 {
-    private const string TableName = "Medals";
-
     /// <inheritdoc />
     public List<Entity> GetRecords()
     {
-        const string query = $"SELECT * FROM {TableName}";
+        const string query = $"SELECT * FROM Medals";
+        var parameters = new Dictionary<string, object>();
         List<Entity> medalsRecords = [];
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return medalsRecords;
         foreach (var singleResponse in fullResponse)
@@ -44,41 +43,49 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public bool CreateRecord(Entity entity)
     {
-        var athleteId = ((Medal)entity).Athlete?.Id ?? 0;
-        var competitionId = ((Medal)entity).Competition?.Id ?? 0;
-        var eventId = ((Medal)entity).Event?.Id ?? 0;
-        var medalTier = ((Medal)entity).MedalTier.Replace("'", "''");
+        var parameters = new Dictionary<string, object>
+        {
+            { "@AthleteID", ((Medal)entity).Athlete?.Id ?? 0 },
+            { "@CompetitionId", ((Medal)entity).Competition?.Id ?? 0 },
+            { "@EventId", ((Medal)entity).Event?.Id ?? 0 },
+            { "@MedalTier", ((Medal)entity).MedalTier.Replace("'", "''") }
+        };
         var query =
-            $"INSERT INTO {TableName} (AthleteID, CompetitionId, EventId, MedalTier) VALUES ({athleteId}, {competitionId}, {eventId}, '{medalTier}')";
+            $"INSERT INTO Medals (AthleteID, CompetitionId, EventId, MedalTier) VALUES (@AthleteID, @CompetitionId, @EventId, @MedalTier)";
 
-        return _db.UpdateDb(query);
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
-        var athleteId = ((Medal)entity).Athlete?.Id ?? 0;
-        var competitionId = ((Medal)entity).Competition?.Id ?? 0;
-        var eventId = ((Medal)entity).Event?.Id ?? 0;
-        var medalTier = ((Medal)entity).MedalTier.Replace("'", "''");
+        var parameters = new Dictionary<string, object>
+        {
+            { "@AthleteID", ((Medal)entity).Athlete?.Id ?? 0 },
+            { "@CompetitionId", ((Medal)entity).Competition?.Id ?? 0 },
+            { "@EventId", ((Medal)entity).Event?.Id ?? 0 },
+            { "@MedalTier", ((Medal)entity).MedalTier.Replace("'", "''") }
+        };
         var query =
-            $"UPDATE {TableName} SET AthleteID = {athleteId}, CompetitionId = {competitionId}, EventId = {eventId}, MedalTier = '{medalTier}' WHERE Id = {entity.Id}";
+            $"UPDATE Medals SET AthleteID = @AthleteID, CompetitionId = @CompetitionId, EventId = @EventId, MedalTier = @MedalTier WHERE Id = {entity.Id}";
 
-        return _db.UpdateDb(query);
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM {TableName} WHERE Id = {recordId}";
-        return _db.UpdateDb(query);
+        var query = $"DELETE FROM Medals WHERE Id = @Id";
+        var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Id = {recordId}";
-        var singleResponse = _db.ReadOneDb(query);
+        var query = $"SELECT * FROM Medals WHERE Id = @Id";
+        var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return null;
         Entity entity = new Athlete();
@@ -99,8 +106,9 @@ public class DaoMedals : IDAO
                 JOIN Competitions c ON m.CompetitionID = c.Id
                 JOIN Events e ON m.EventID = e.Id";
 
+        var parameters = new Dictionary<string, object>();
         List<Medal> medalsRecords = new();
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return medalsRecords;
 
@@ -159,10 +167,11 @@ public class DaoMedals : IDAO
         JOIN Athletes a ON m.AthleteID = a.Id
         JOIN Competitions c ON m.CompetitionID = c.Id
         JOIN Events e ON m.EventID = e.Id
-        WHERE m.AthleteID = {athleteId}";
+        WHERE m.AthleteID = @AthleteID";
 
+        var parameters = new Dictionary<string, object> { { "@AthleteID", athleteId } };
         List<Medal> medalsRecords = new();
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return medalsRecords;
 

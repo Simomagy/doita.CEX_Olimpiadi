@@ -21,14 +21,13 @@ namespace CEX_Olimpiadi.DAO_Classes;
 
 public class DaoCompetitions : IDAO
 {
-    private const string TableName = "Competitions";
-
     /// <inheritdoc />
     public List<Entity> GetRecords()
     {
-        const string query = $"SELECT * FROM {TableName}";
+        const string query = $"SELECT * FROM Competitions";
+        var parameters = new Dictionary<string, object>();
         List<Entity> competitionsRecords = [];
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return competitionsRecords;
         foreach (var singleResponse in fullResponse)
@@ -45,41 +44,52 @@ public class DaoCompetitions : IDAO
     /// <inheritdoc />
     public bool CreateRecord(Entity entity)
     {
-        var type = ((Competition)entity).Type.Replace("'", "''");
-        var isIndoor = ((Competition)entity).IsIndoor ? 1 : 0;
-        var isTeamComp = ((Competition)entity).IsTeamComp ? 1 : 0;
-        var category = ((Competition)entity).Category.Replace("'", "''");
         var query =
-            $"INSERT INTO {TableName} (Type, IsIndoor, IsTeamComp, Category) VALUES ('{type}', {isIndoor}, {isTeamComp}, '{category}')";
+            $"INSERT INTO Competitions (Type, IsIndoor, IsTeamComp, Category, EventId) VALUES (@Type, @IsIndoor, @IsTeamComp, @Category, @EventId)";
 
-        return _db.UpdateDb(query);
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Type", ((Competition)entity).Type },
+            { "@IsIndoor", ((Competition)entity).IsIndoor ? 1 : 0 },
+            { "@IsTeamComp", ((Competition)entity).IsTeamComp ? 1 : 0 },
+            { "@Category", ((Competition)entity).Category.Replace("'", "''") },
+            { "@EventId", ((Competition)entity).EventId }
+        };
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
-        var type = ((Competition)entity).Type.Replace("'", "''");
-        var isIndoor = ((Competition)entity).IsIndoor ? 1 : 0;
-        var isTeamComp = ((Competition)entity).IsTeamComp ? 1 : 0;
-        var category = ((Competition)entity).Category.Replace("'", "''");
         var query =
-            $"UPDATE {TableName} SET Type = '{type}', IsIndoor = {isIndoor}, IsTeamComp = {isTeamComp}, Category = '{category}' WHERE Id = {entity.Id}";
+            $"UPDATE Competitions SET Type = @Type, IsIndoor = @IsIndoor, IsTeamComp = @IsTeamComp, Category = @Category, EventId = @EventId WHERE Id = @Id";
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Type", ((Competition)entity).Type },
+            { "@IsIndoor", ((Competition)entity).IsIndoor ? 1 : 0 },
+            { "@IsTeamComp", ((Competition)entity).IsTeamComp ? 1 : 0 },
+            { "@Category", ((Competition)entity).Category },
+            { "@EventId", ((Competition)entity).EventId },
+            { "@Id", entity.Id }
+        };
 
-        return _db.UpdateDb(query);
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM {TableName} WHERE Id = {recordId}";
-        return _db.UpdateDb(query);
+        var query = $"DELETE FROM Competitions WHERE Id = @Id";
+        var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+        return _db.UpdateDb(query, parameters);
     }
 
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM {TableName} WHERE Id = {recordId}";
-        var singleResponse = _db.ReadOneDb(query);
+        var query = $"SELECT * FROM Competitions WHERE Id = @id";
+        var parameters = new Dictionary<string, object> { { "@id", recordId } };
+        var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
             return null;
         Entity entity = new Competition();
@@ -89,9 +99,10 @@ public class DaoCompetitions : IDAO
 
     public List<Entity> GetCompetitionsByEventId(int eventId)
     {
-        var query = $"SELECT * FROM {TableName} WHERE EventId = {eventId}";
+        var query = $"SELECT * FROM Competitions WHERE EventId = @EventId";
+        var parameters = new Dictionary<string, object> { { "@EventId", eventId } };
         List<Entity> competitionsRecords = [];
-        var fullResponse = _db.ReadDb(query);
+        var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return competitionsRecords;
         foreach (var singleResponse in fullResponse)

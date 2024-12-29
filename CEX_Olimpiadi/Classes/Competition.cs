@@ -27,6 +27,7 @@ public class Competition : Entity
     public bool IsIndoor { get; set; }
     public bool IsTeamComp { get; set; }
     public string Category { get; set; } = string.Empty;
+    public int EventId { get; set; }
 
     /// <summary>
     ///     Rappresenta i dati di una competizione sportiva in formato stringa

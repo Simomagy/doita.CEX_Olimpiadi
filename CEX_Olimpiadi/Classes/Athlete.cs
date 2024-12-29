@@ -27,7 +27,6 @@ public class Athlete : Entity
     public string Surname { get; set; } = string.Empty;
     public DateTime Dob { get; set; }
     public string Country { get; set; } = string.Empty;
-    public List<Medal> Medals { get; set; }
 
     /// <summary>
     ///     Override per il metodo <see cref="Entity.ToString" />

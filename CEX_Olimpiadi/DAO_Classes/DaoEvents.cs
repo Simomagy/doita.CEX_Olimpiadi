@@ -21,13 +21,12 @@ namespace CEX_Olimpiadi.DAO_Classes
 {
     public class DaoEvents : IDAO
     {
-        const string TableName = "Events";
-
         public List<Entity> GetRecords()
         {
-            const string query = $"SELECT * FROM {TableName}";
+            const string query = $"SELECT * FROM Events";
+            var parameters = new Dictionary<string, object>();
             List<Entity> eventsRecords = [];
-            var fullResponse = _db.ReadDb(query);
+            var fullResponse = _db.ReadDb(query, parameters);
             if (fullResponse == null)
                 return eventsRecords;
             foreach (var singleResponse in fullResponse)
@@ -36,39 +35,52 @@ namespace CEX_Olimpiadi.DAO_Classes
                 entity.TypeSort(singleResponse);
                 eventsRecords.Add(entity);
             }
+
             return eventsRecords;
         }
+
         /// <inheritdoc />
         public bool CreateRecord(Entity entity)
         {
-            var name = ((Event)entity).Name.Replace("'", "''");
-            var year = ((Event)entity).Year;
-            var location = ((Event)entity).Location.Replace("'", "''");
-            var query = $"INSERT INTO {TableName} (Name, Surname, Dob, Country) VALUES ('{name}', '{year}', '{location}')";
+            var parameters = new Dictionary<string, object>
+            {
+                { "@Name", ((Event)entity).Name.Replace("'", "''") },
+                { "@Year", ((Event)entity).Year },
+                { "@Location", ((Event)entity).Location.Replace("'", "''") }
+            };
+            var query = $"INSERT INTO Events (Name, Year, Location) VALUES (@Name, @Year, @Location)";
 
-            return _db.UpdateDb(query);
+            return _db.UpdateDb(query, parameters);
         }
+
         /// <inheritdoc />
         public bool UpdateRecord(Entity entity)
         {
-            var name = ((Event)entity).Name.Replace("'", "''");
-            var year = ((Event)entity).Year;
-            var location = ((Event)entity).Location.Replace("'", "''");
-            var query = $"UPDATE {TableName} SET Name = '{name}', Year = '{year}', Location = '{location}' WHERE Id = {entity.Id}";
+            var parameters = new Dictionary<string, object>
+            {
+                { "@Name", ((Event)entity).Name.Replace("'", "''") },
+                { "@Year", ((Event)entity).Year },
+                { "@Location", ((Event)entity).Location.Replace("'", "''") }
+            };
+            var query = $"UPDATE Events SET Name = @Name, Year = @Year, Location = @Location WHERE Id = {entity.Id}";
 
-            return _db.UpdateDb(query);
+            return _db.UpdateDb(query, parameters);
         }
+
         /// <inheritdoc />
         public bool DeleteRecord(int recordId)
         {
-            var query = $"DELETE FROM {TableName} WHERE Id = {recordId}";
-            return _db.UpdateDb(query);
+            var query = $"DELETE FROM Events WHERE Id = @Id";
+            var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+            return _db.UpdateDb(query, parameters);
         }
+
         /// <inheritdoc />
         public Entity? FindRecord(int recordId)
         {
-            var query = $"SELECT * FROM {TableName} WHERE Id = {recordId}";
-            var singleResponse = _db.ReadOneDb(query);
+            var query = $"SELECT * FROM Events WHERE Id = @Id";
+            var parameters = new Dictionary<string, object> { { "@Id", recordId } };
+            var singleResponse = _db.ReadOneDb(query, parameters);
             if (singleResponse == null)
                 return null;
             Entity entity = new Athlete();
@@ -78,8 +90,13 @@ namespace CEX_Olimpiadi.DAO_Classes
 
         public int GetEventIdByNameAndYear(string name, int year)
         {
-            var query = $"SELECT Id FROM {TableName} WHERE Name = '{name}' AND Year = '{year}'";
-            var singleResponse = _db.ReadOneDb(query);
+            var query = $"SELECT Id FROM Events WHERE Name = @Name AND Year = @Year";
+            var parameters = new Dictionary<string, object>
+            {
+                { "@Name", name },
+                { "@Year", year }
+            };
+            var singleResponse = _db.ReadOneDb(query, parameters);
             if (singleResponse == null)
                 return -1;
             return int.Parse(singleResponse["id"]);
@@ -87,14 +104,16 @@ namespace CEX_Olimpiadi.DAO_Classes
 
         public Entity GetEventById(int id)
         {
-            var query = $"SELECT * FROM {TableName} WHERE Id = {id}";
-            var singleResponse = _db.ReadOneDb(query);
+            var query = $"SELECT * FROM Events WHERE Id = @Id";
+            var parameters = new Dictionary<string, object> { { "@Id", id } };
+            var singleResponse = _db.ReadOneDb(query, parameters);
             if (singleResponse == null)
                 return null;
             Entity entity = new Event();
             entity.TypeSort(singleResponse);
             return entity;
         }
+
         #region Singleton
 
         static DaoEvents? _instance;
@@ -103,7 +122,5 @@ namespace CEX_Olimpiadi.DAO_Classes
         public static DaoEvents GetInstance() => _instance ??= new DaoEvents();
 
         #endregion
-
-
     }
 }
