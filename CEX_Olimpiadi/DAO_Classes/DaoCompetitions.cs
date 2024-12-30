@@ -25,9 +25,8 @@ public class DaoCompetitions : IDAO
     public List<Entity> GetRecords()
     {
         const string query = $"SELECT * FROM Competitions";
-        var parameters = new Dictionary<string, object>();
         List<Entity> competitionsRecords = [];
-        var fullResponse = _db.ReadDb(query, parameters);
+        var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
             return competitionsRecords;
         foreach (var singleResponse in fullResponse)
@@ -44,16 +43,17 @@ public class DaoCompetitions : IDAO
     /// <inheritdoc />
     public bool CreateRecord(Entity entity)
     {
+        var competition = (Competition)entity;
         var query =
             $"INSERT INTO Competitions (Type, IsIndoor, IsTeamComp, Category, EventId) VALUES (@Type, @IsIndoor, @IsTeamComp, @Category, @EventId)";
 
         var parameters = new Dictionary<string, object>
         {
-            { "@Type", ((Competition)entity).Type },
-            { "@IsIndoor", ((Competition)entity).IsIndoor ? 1 : 0 },
-            { "@IsTeamComp", ((Competition)entity).IsTeamComp ? 1 : 0 },
-            { "@Category", ((Competition)entity).Category.Replace("'", "''") },
-            { "@EventId", ((Competition)entity).EventId }
+            { "@Type", competition.Type },
+            { "@IsIndoor", competition.IsIndoor ? 1 : 0 },
+            { "@IsTeamComp", competition.IsTeamComp ? 1 : 0 },
+            { "@Category", competition.Category.Replace("'", "''") },
+            { "@EventId", competition.EventId }
         };
         return _db.UpdateDb(query, parameters);
     }
@@ -61,15 +61,16 @@ public class DaoCompetitions : IDAO
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
+        var competition = (Competition)entity;
         var query =
             $"UPDATE Competitions SET Type = @Type, IsIndoor = @IsIndoor, IsTeamComp = @IsTeamComp, Category = @Category, EventId = @EventId WHERE Id = @Id";
         var parameters = new Dictionary<string, object>
         {
-            { "@Type", ((Competition)entity).Type },
-            { "@IsIndoor", ((Competition)entity).IsIndoor ? 1 : 0 },
-            { "@IsTeamComp", ((Competition)entity).IsTeamComp ? 1 : 0 },
-            { "@Category", ((Competition)entity).Category },
-            { "@EventId", ((Competition)entity).EventId },
+            { "@Type", competition.Type },
+            { "@IsIndoor", competition.IsIndoor ? 1 : 0 },
+            { "@IsTeamComp", competition.IsTeamComp ? 1 : 0 },
+            { "@Category", competition.Category },
+            { "@EventId", competition.EventId },
             { "@Id", entity.Id }
         };
 

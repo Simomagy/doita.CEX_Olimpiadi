@@ -25,9 +25,8 @@ public class DaoMedals : IDAO
     public List<Entity> GetRecords()
     {
         const string query = $"SELECT * FROM Medals";
-        var parameters = new Dictionary<string, object>();
         List<Entity> medalsRecords = [];
-        var fullResponse = _db.ReadDb(query, parameters);
+        var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
             return medalsRecords;
         foreach (var singleResponse in fullResponse)
@@ -43,12 +42,13 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public bool CreateRecord(Entity entity)
     {
+        var medal = (Medal)entity;
         var parameters = new Dictionary<string, object>
         {
-            { "@AthleteID", ((Medal)entity).Athlete?.Id ?? 0 },
-            { "@CompetitionId", ((Medal)entity).Competition?.Id ?? 0 },
-            { "@EventId", ((Medal)entity).Event?.Id ?? 0 },
-            { "@MedalTier", ((Medal)entity).MedalTier.Replace("'", "''") }
+            { "@AthleteID", medal.Athlete?.Id ?? 0 },
+            { "@CompetitionId", medal.Competition?.Id ?? 0 },
+            { "@EventId", medal.Event?.Id ?? 0 },
+            { "@MedalTier", medal.MedalTier.Replace("'", "''") }
         };
         var query =
             $"INSERT INTO Medals (AthleteID, CompetitionId, EventId, MedalTier) VALUES (@AthleteID, @CompetitionId, @EventId, @MedalTier)";
@@ -59,12 +59,13 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
+        var medal = (Medal)entity;
         var parameters = new Dictionary<string, object>
         {
-            { "@AthleteID", ((Medal)entity).Athlete?.Id ?? 0 },
-            { "@CompetitionId", ((Medal)entity).Competition?.Id ?? 0 },
-            { "@EventId", ((Medal)entity).Event?.Id ?? 0 },
-            { "@MedalTier", ((Medal)entity).MedalTier.Replace("'", "''") }
+            { "@AthleteID", medal.Athlete?.Id ?? 0 },
+            { "@CompetitionId", medal.Competition?.Id ?? 0 },
+            { "@EventId", medal.Event?.Id ?? 0 },
+            { "@MedalTier", medal.MedalTier.Replace("'", "''") }
         };
         var query =
             $"UPDATE Medals SET AthleteID = @AthleteID, CompetitionId = @CompetitionId, EventId = @EventId, MedalTier = @MedalTier WHERE Id = {entity.Id}";
@@ -93,22 +94,21 @@ public class DaoMedals : IDAO
         return entity;
     }
 
-    public List<Medal> GetMedals()
+    public List<Medal> GetAllMedals()
     {
         var query = @"
                 SELECT 
                     m.Id AS MedalId, m.MedalTier, 
-                    a.Id AS AthleteId, a.Name AS AthleteName, a.Surname AS AthleteSurname, a.Dob AS AthleteDob, a.Country AS AthleteCountry,
-                    c.Id AS CompetitionId, c.Type AS CompetitionType, c.IsIndoor, c.IsTeamComp, c.Category AS CompetitionCategory,
-                    e.Id AS EventId, e.Name AS EventName, e.Year AS EventYear, e.Location AS EventLocation
+                    a.Id AS AthleteId, a.Name AS AthleteName, a.Surname, a.Dob, a.Country,
+                    c.Id AS CompetitionId, c.Type, c.IsIndoor, c.IsTeamComp, c.Category,
+                    e.Id AS EventId, e.Name AS EventName, e.Year, e.Location
                 FROM Medals m
                 JOIN Athletes a ON m.AthleteID = a.Id
                 JOIN Competitions c ON m.CompetitionID = c.Id
                 JOIN Events e ON m.EventID = e.Id";
 
-        var parameters = new Dictionary<string, object>();
         List<Medal> medalsRecords = new();
-        var fullResponse = _db.ReadDb(query, parameters);
+        var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
             return medalsRecords;
 
@@ -118,35 +118,18 @@ public class DaoMedals : IDAO
             medal.TypeSort(singleResponse);
 
             // Populate Athlete
-            var athlete = new Athlete
-            {
-                Id = int.Parse(singleResponse["athleteid"]),
-                Name = singleResponse["athletename"],
-                Surname = singleResponse["athletesurname"],
-                Dob = DateTime.Parse(singleResponse["athletedob"]),
-                Country = singleResponse["athletecountry"]
-            };
+            var athlete = new Athlete();
+            athlete.TypeSort(singleResponse);
             medal.Athlete = athlete;
 
             // Populate Competition
-            var competition = new Competition
-            {
-                Id = int.Parse(singleResponse["competitionid"]),
-                Type = singleResponse["competitiontype"],
-                IsIndoor = bool.Parse(singleResponse["isindoor"]),
-                IsTeamComp = bool.Parse(singleResponse["isteamcomp"]),
-                Category = singleResponse["competitioncategory"]
-            };
+            var competition = new Competition();
+            competition.TypeSort(singleResponse);
             medal.Competition = competition;
 
             // Populate Event
-            var eventEntity = new Event
-            {
-                Id = int.Parse(singleResponse["eventid"]),
-                Name = singleResponse["eventname"],
-                Year = int.Parse(singleResponse["eventyear"]),
-                Location = singleResponse["eventlocation"]
-            };
+            var eventEntity = new Event();
+            eventEntity.TypeSort(singleResponse);
             medal.Event = eventEntity;
 
             medalsRecords.Add(medal);
@@ -160,9 +143,9 @@ public class DaoMedals : IDAO
         var query = $@"
         SELECT 
             m.Id AS MedalId, m.MedalTier, 
-            a.Id AS AthleteId, a.Name AS AthleteName, a.Surname AS AthleteSurname, a.Dob AS AthleteDob, a.Country AS AthleteCountry,
-            c.Id AS CompetitionId, c.Type AS CompetitionType, c.IsIndoor, c.IsTeamComp, c.Category AS CompetitionCategory,
-            e.Id AS EventId, e.Name AS EventName, e.Year AS EventYear, e.Location AS EventLocation
+            a.Id AS AthleteId, a.Name, a.Surname, a.Dob, a.Country,
+            c.Id AS CompetitionId, c.Type, c.IsIndoor, c.IsTeamComp, c.Category,
+            e.Id AS EventId, e.Name, e.Year, e.Location
         FROM Medals m
         JOIN Athletes a ON m.AthleteID = a.Id
         JOIN Competitions c ON m.CompetitionID = c.Id
@@ -170,7 +153,7 @@ public class DaoMedals : IDAO
         WHERE m.AthleteID = @AthleteID";
 
         var parameters = new Dictionary<string, object> { { "@AthleteID", athleteId } };
-        List<Medal> medalsRecords = new();
+        List<Medal> medalsRecords = [];
         var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return medalsRecords;
@@ -181,35 +164,18 @@ public class DaoMedals : IDAO
             medal.TypeSort(singleResponse);
 
             // Populate Athlete
-            var athlete = new Athlete
-            {
-                Id = int.Parse(singleResponse["athleteid"]),
-                Name = singleResponse["athletename"],
-                Surname = singleResponse["athletesurname"],
-                Dob = DateTime.Parse(singleResponse["athletedob"]),
-                Country = singleResponse["athletecountry"]
-            };
+            var athlete = new Athlete();
+            athlete.TypeSort(singleResponse);
             medal.Athlete = athlete;
 
             // Populate Competition
-            var competition = new Competition
-            {
-                Id = int.Parse(singleResponse["competitionid"]),
-                Type = singleResponse["competitiontype"],
-                IsIndoor = bool.Parse(singleResponse["isindoor"]),
-                IsTeamComp = bool.Parse(singleResponse["isteamcomp"]),
-                Category = singleResponse["competitioncategory"]
-            };
+            var competition = new Competition();
+            competition.TypeSort(singleResponse);
             medal.Competition = competition;
 
             // Populate Event
-            var eventEntity = new Event
-            {
-                Id = int.Parse(singleResponse["eventid"]),
-                Name = singleResponse["eventname"],
-                Year = int.Parse(singleResponse["eventyear"]),
-                Location = singleResponse["eventlocation"]
-            };
+            var eventEntity = new Event();
+            eventEntity.TypeSort(singleResponse);
             medal.Event = eventEntity;
 
             medalsRecords.Add(medal);

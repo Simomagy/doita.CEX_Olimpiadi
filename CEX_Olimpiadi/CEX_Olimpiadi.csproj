@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MSSTU.DB.Utility" Version="2.1.1"/>
+        <PackageReference Include="MSSTU.DB.Utility" Version="2.1.3"/>
     </ItemGroup>
 
 </Project>

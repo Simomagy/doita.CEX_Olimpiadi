@@ -24,9 +24,8 @@ namespace CEX_Olimpiadi.DAO_Classes
         public List<Entity> GetRecords()
         {
             const string query = $"SELECT * FROM Events";
-            var parameters = new Dictionary<string, object>();
             List<Entity> eventsRecords = [];
-            var fullResponse = _db.ReadDb(query, parameters);
+            var fullResponse = _db.ReadDb(query);
             if (fullResponse == null)
                 return eventsRecords;
             foreach (var singleResponse in fullResponse)
@@ -102,7 +101,7 @@ namespace CEX_Olimpiadi.DAO_Classes
             return int.Parse(singleResponse["id"]);
         }
 
-        public Entity GetEventById(int id)
+        public Entity? GetEventById(int id)
         {
             var query = $"SELECT * FROM Events WHERE Id = @Id";
             var parameters = new Dictionary<string, object> { { "@Id", id } };

@@ -17,7 +17,6 @@ using CEX_Olimpiadi.DAO_Classes;
 
 #endregion
 
-Console.WriteLine("Hello, World!");
 // Menu principale
 Console.WriteLine("Benvenuto nel programma di gestione delle Olimpiadi!");
 Console.WriteLine("Cosa vuoi fare?");
@@ -29,7 +28,7 @@ Console.WriteLine("Cosa vuoi fare?");
 // Visualizzare il nominativo e la nazione dell'atleta più vecchio a vincere una medaglia d'oro (voglio vedere il più vecchio a vincere rispetto alla data di vittoria: se uno ha vinto l'oro a 20 anni e ora è il più vecchio non va bene!! Voglio l'80enne vincitore ad esempio!)
 // Quante medaglie sono state vinte in sport di squadra e quanti atleti ne facevano parte
 // Il nome della categoria più vinta nel medagliere
-var menu = @"
+const string menu = @"
 1. Visualizza le medaglie di un atleta
 2. Visualizza le gare di un evento
 3. Visualizza il numero di medaglie vinte da un atleta
@@ -84,6 +83,7 @@ while (isRunning)
 }
 
 Console.WriteLine("Arrivederci!");
+return;
 
 // Medodi per la gestione delle scelte dell'utente
 static void Choice1()
@@ -93,7 +93,7 @@ static void Choice1()
     Console.WriteLine("Inserisci il cognome dell'atleta: ");
     var surname = Console.ReadLine()?.ToLower() ?? string.Empty;
     // Recupero l'atleta
-    var atleta = (Athlete)DaoAthletes.GetInstance().GetAthleteByFullName(name, surname);
+    var atleta = DaoAthletes.GetInstance().GetAthleteByFullName(name, surname) as Athlete;
     if (atleta == null)
     {
         Console.WriteLine("Atleta non trovato\n Vuoi riprovare? (s/n)");
@@ -104,11 +104,11 @@ static void Choice1()
     // Visualizzo le medaglie
     var athleteId = DaoAthletes.GetInstance().GetAthleteIdByFullName(name, surname);
     var medaglie = DaoMedals.GetInstance().GetAthleteMedals(athleteId);
-    Console.WriteLine($"Medaglie vinte da {atleta.Name} {atleta.Surname}:");
+    Console.WriteLine($"Medaglie vinte da {atleta?.Name} {atleta?.Surname}:");
     foreach (var medaglia in medaglie)
     {
-        var medal = medaglia;
-        Console.WriteLine($"- {medal.MedalTier} {medal.Competition?.Type}, {medal.Event?.Name} {medal.Event?.Year}");
+        Console.WriteLine(
+            $"- {medaglia.MedalTier} {medaglia.Competition?.Type}, {medaglia.Event?.Name} {medaglia.Event?.Year}");
     }
 }
 
@@ -133,8 +133,8 @@ static void Choice3()
     Console.WriteLine("Inserisci il cognome dell'atleta: ");
     var surname = Console.ReadLine()?.ToLower() ?? string.Empty;
     // Recupero l'atleta
-    var atleta = (Athlete)DaoAthletes.GetInstance().GetAthleteByFullName(name, surname);
-    if (atleta == null)
+    var athlete = DaoAthletes.GetInstance().GetAthleteByFullName(name, surname) as Athlete;
+    if (athlete == null)
     {
         Console.WriteLine("Atleta non trovato\n Vuoi riprovare? (s/n)");
         if (Console.ReadLine()?.ToLower() == "s")
@@ -142,12 +142,12 @@ static void Choice3()
     }
 
     var athleteId = DaoAthletes.GetInstance().GetAthleteIdByFullName(name, surname);
-    var medaglie = DaoMedals.GetInstance().GetAthleteMedals(athleteId);
-    Console.WriteLine($"Medaglie vinte da {atleta.Name} {atleta.Surname}: ");
+    var medals = DaoMedals.GetInstance().GetAthleteMedals(athleteId);
+    Console.WriteLine($"Medaglie vinte da {athlete?.Name} {athlete?.Surname}: ");
     var goldCount = 0;
     var silverCount = 0;
     var bronzeCount = 0;
-    foreach (var medaglia in medaglie)
+    foreach (var medaglia in medals)
         switch (medaglia.MedalTier)
         {
             case "Oro":
@@ -187,9 +187,8 @@ static void Choice4()
         Console.WriteLine(atleta.ToString());
         // Recupero le medaglie
         var medaglie = DaoMedals.GetInstance().GetAthleteMedals(atleta.Id);
-        foreach (var medaglia in medaglie)
+        foreach (var medal in medaglie)
         {
-            var medal = (Medal)medaglia;
             Console.WriteLine(
                 $"- {medal.MedalTier} {medal.Competition?.Type}, {medal.Event?.Name} {medal.Event?.Year}");
         }
@@ -216,7 +215,7 @@ static void Choice6()
     // esempio
     // Sport: Pallanuoto -> Giocatori: 10, Medaglie: 2;
     // Sport: Scherma a Squadre -> Giocatori: 2, Medaglie: 1)
-    var medals = DaoMedals.GetInstance().GetMedals();
+    var medals = DaoMedals.GetInstance().GetAllMedals();
     var teamMedals = medals.FindAll(medal => medal.Competition?.IsTeamComp == true);
     var teamMedalsGrouped = teamMedals.GroupBy(medal => medal.Competition?.Type);
     foreach (var group in teamMedalsGrouped)
@@ -231,16 +230,16 @@ static void Choice6()
 static void Choice7()
 {
     //Visualizza lo sport più vinto nel medagliere
-    var medals = DaoMedals.GetInstance().GetMedals();
+    var medals = DaoMedals.GetInstance().GetAllMedals();
     var sports = medals.GroupBy(medal => medal.Competition?.Type);
     var maxSport = sports.OrderByDescending(sport => sport.Count()).First();
     Console.WriteLine($"Lo sport più vinto è {maxSport.Key}");
     // Visualizzo le medaglie
-    foreach (var medaglia in maxSport)
+    foreach (var medal in maxSport)
     {
-        var medal = (Medal)medaglia;
         Console.WriteLine(
             $"- {medal.MedalTier} {medal.Competition?.Type}, {medal.Event?.Name} {medal.Event?.Year} ({medal.Event?.Location})");
-        Console.WriteLine($"  Atleta: {medal.Athlete?.Name} {medal.Athlete?.Surname} ({medal.Athlete?.Country}), Classe: {medal.Athlete?.Dob:yyyy}");
+        Console.WriteLine(
+            $"  Atleta: {medal.Athlete?.Name} {medal.Athlete?.Surname} ({medal.Athlete?.Country}), Classe: {medal.Athlete?.Dob:yyyy}");
     }
 }

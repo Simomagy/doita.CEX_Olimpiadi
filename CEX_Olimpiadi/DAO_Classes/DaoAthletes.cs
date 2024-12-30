@@ -25,9 +25,8 @@ public class DaoAthletes : IDAO
     public List<Entity> GetRecords()
     {
         const string query = $"SELECT * FROM Athletes";
-        var parameters = new Dictionary<string, object>();
         List<Entity> athletesRecords = [];
-        var fullResponse = _db.ReadDb(query, parameters);
+        var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
             return athletesRecords;
         foreach (var singleResponse in fullResponse)
@@ -76,8 +75,7 @@ public class DaoAthletes : IDAO
     public bool DeleteRecord(int recordId)
     {
         var query = $"DELETE FROM Athletes WHERE Id = @Id";
-        var parameters = new Dictionary<string, object>();
-        return _db.UpdateDb(query, parameters);
+        return _db.UpdateDb(query);
     }
 
     /// <inheritdoc />
@@ -146,23 +144,22 @@ public class DaoAthletes : IDAO
     public Athlete GetOldestGoldWinner()
     {
         const string query = @"
-            SELECT TOP 1
-                Athletes.Id, 
-                Athletes.Name, 
-                Athletes.Surname, 
-                Athletes.Dob, 
-                Athletes.Country, 
-                Medals.MedalTier
-            FROM 
-                Athletes
-                JOIN Medals ON Athletes.Id = Medals.AthleteId 
-            WHERE 
-                Medals.MedalTier = 'Oro' 
-            ORDER BY 
-                Athletes.Dob ASC 
-            ";
-        var parameters = new Dictionary<string, object>();
-        var singleResponse = _db.ReadOneDb(query, parameters);
+                    SELECT TOP 1
+                        Athletes.Id, 
+                        Athletes.Name, 
+                        Athletes.Surname, 
+                        Athletes.Dob, 
+                        Athletes.Country, 
+                        Medals.MedalTier
+                    FROM 
+                        Athletes
+                        JOIN Medals ON Athletes.Id = Medals.AthleteId 
+                    WHERE 
+                        Medals.MedalTier = 'Oro' 
+                    ORDER BY 
+                        Athletes.Dob 
+                    ";
+        var singleResponse = _db.ReadOneDb(query);
         if (singleResponse == null)
             return new Athlete();
         Entity entity = new Athlete();
