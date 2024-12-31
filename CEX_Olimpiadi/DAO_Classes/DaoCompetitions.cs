@@ -44,7 +44,7 @@ public class DaoCompetitions : IDAO
     public bool CreateRecord(Entity entity)
     {
         var competition = (Competition)entity;
-        var query =
+        const string query =
             $"INSERT INTO Competitions (Type, IsIndoor, IsTeamComp, Category, EventId) VALUES (@Type, @IsIndoor, @IsTeamComp, @Category, @EventId)";
 
         var parameters = new Dictionary<string, object>
@@ -62,7 +62,7 @@ public class DaoCompetitions : IDAO
     public bool UpdateRecord(Entity entity)
     {
         var competition = (Competition)entity;
-        var query =
+        const string query =
             $"UPDATE Competitions SET Type = @Type, IsIndoor = @IsIndoor, IsTeamComp = @IsTeamComp, Category = @Category, EventId = @EventId WHERE Id = @Id";
         var parameters = new Dictionary<string, object>
         {
@@ -80,7 +80,7 @@ public class DaoCompetitions : IDAO
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM Competitions WHERE Id = @Id";
+        const string query = "DELETE FROM Competitions WHERE Id = @Id";
         var parameters = new Dictionary<string, object> { { "@Id", recordId } };
         return _db.UpdateDb(query, parameters);
     }
@@ -88,7 +88,7 @@ public class DaoCompetitions : IDAO
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM Competitions WHERE Id = @id";
+        const string query = "SELECT * FROM Competitions WHERE Id = @id";
         var parameters = new Dictionary<string, object> { { "@id", recordId } };
         var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
@@ -100,7 +100,7 @@ public class DaoCompetitions : IDAO
 
     public List<Entity> GetCompetitionsByEventId(int eventId)
     {
-        var query = $"SELECT * FROM Competitions WHERE EventId = @EventId";
+        const string query = "SELECT * FROM Competitions WHERE EventId = @EventId";
         var parameters = new Dictionary<string, object> { { "@EventId", eventId } };
         List<Entity> competitionsRecords = [];
         var fullResponse = _db.ReadDb(query, parameters);

@@ -49,7 +49,7 @@ public class DaoAthletes : IDAO
             { "@Dob", ((Athlete)entity).Dob },
             { "@Country", ((Athlete)entity).Country.Replace("'", "''") }
         };
-        var query =
+        const string query =
             $"INSERT INTO Athletes (Name, Surname, Dob, Country) VALUES (@Name, @Surname, @Dob, @Country)";
 
         return _db.UpdateDb(query, parameters);
@@ -63,10 +63,11 @@ public class DaoAthletes : IDAO
             { "@Name", ((Athlete)entity).Name.Replace("'", "''") },
             { "@Surname", ((Athlete)entity).Surname.Replace("'", "''") },
             { "@Dob", ((Athlete)entity).Dob },
-            { "@Country", ((Athlete)entity).Country.Replace("'", "''") }
+            { "@Country", ((Athlete)entity).Country.Replace("'", "''") },
+            { "@Id", entity.Id }
         };
-        var query =
-            $"UPDATE Athletes SET Name = @Name, Surname = @Surname, Dob = @Dob, Country = @Country WHERE Id = {entity.Id}";
+        const string query =
+            "UPDATE Athletes SET Name = @Name, Surname = @Surname, Dob = @Dob, Country = @Country WHERE Id = @Id";
 
         return _db.UpdateDb(query, parameters);
     }
@@ -74,14 +75,14 @@ public class DaoAthletes : IDAO
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM Athletes WHERE Id = @Id";
+        const string query = "DELETE FROM Athletes WHERE Id = @Id";
         return _db.UpdateDb(query);
     }
 
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM Athletes WHERE Id = @Id";
+        const string query = "SELECT * FROM Athletes WHERE Id = @Id";
         var parameters = new Dictionary<string, object> { { "@Id", recordId } };
         var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
@@ -93,7 +94,7 @@ public class DaoAthletes : IDAO
 
     public Entity? GetAthleteByFullName(string name, string surname)
     {
-        var query = $"SELECT * FROM Athletes WHERE Name = @Name AND Surname = @Surname";
+        const string query = "SELECT * FROM Athletes WHERE Name = @Name AND Surname = @Surname";
         var parameters = new Dictionary<string, object>
         {
             { "@Name", name },
@@ -110,7 +111,7 @@ public class DaoAthletes : IDAO
 
     public int GetAthleteIdByFullName(string name, string surname)
     {
-        var query = $"SELECT Id FROM Athletes WHERE Name = @Name AND Surname = @Surname";
+        const string query = "SELECT Id FROM Athletes WHERE Name = @Name AND Surname = @Surname";
         var parameters = new Dictionary<string, object>
         {
             { "@Name", name },
@@ -125,7 +126,7 @@ public class DaoAthletes : IDAO
 
     public List<Athlete> GetAthletesByCountry(string country)
     {
-        var query = $"SELECT * FROM Athletes WHERE Country = @Country";
+        const string query = "SELECT * FROM Athletes WHERE Country = @Country";
         var parameters = new Dictionary<string, object> { { "@Country", country } };
         List<Athlete> athletes = [];
         var fullResponse = _db.ReadDb(query, parameters);

@@ -47,7 +47,7 @@ namespace CEX_Olimpiadi.DAO_Classes
                 { "@Year", ((Event)entity).Year },
                 { "@Location", ((Event)entity).Location.Replace("'", "''") }
             };
-            var query = $"INSERT INTO Events (Name, Year, Location) VALUES (@Name, @Year, @Location)";
+            const string query = "INSERT INTO Events (Name, Year, Location) VALUES (@Name, @Year, @Location)";
 
             return _db.UpdateDb(query, parameters);
         }
@@ -59,9 +59,10 @@ namespace CEX_Olimpiadi.DAO_Classes
             {
                 { "@Name", ((Event)entity).Name.Replace("'", "''") },
                 { "@Year", ((Event)entity).Year },
-                { "@Location", ((Event)entity).Location.Replace("'", "''") }
+                { "@Location", ((Event)entity).Location.Replace("'", "''") },
+                { "@Id", entity.Id }
             };
-            var query = $"UPDATE Events SET Name = @Name, Year = @Year, Location = @Location WHERE Id = {entity.Id}";
+            const string query = "UPDATE Events SET Name = @Name, Year = @Year, Location = @Location WHERE Id = @Id";
 
             return _db.UpdateDb(query, parameters);
         }
@@ -69,7 +70,7 @@ namespace CEX_Olimpiadi.DAO_Classes
         /// <inheritdoc />
         public bool DeleteRecord(int recordId)
         {
-            var query = $"DELETE FROM Events WHERE Id = @Id";
+            const string query = "DELETE FROM Events WHERE Id = @Id";
             var parameters = new Dictionary<string, object> { { "@Id", recordId } };
             return _db.UpdateDb(query, parameters);
         }
@@ -77,7 +78,7 @@ namespace CEX_Olimpiadi.DAO_Classes
         /// <inheritdoc />
         public Entity? FindRecord(int recordId)
         {
-            var query = $"SELECT * FROM Events WHERE Id = @Id";
+            const string query = "SELECT * FROM Events WHERE Id = @Id";
             var parameters = new Dictionary<string, object> { { "@Id", recordId } };
             var singleResponse = _db.ReadOneDb(query, parameters);
             if (singleResponse == null)
@@ -89,7 +90,7 @@ namespace CEX_Olimpiadi.DAO_Classes
 
         public int GetEventIdByNameAndYear(string name, int year)
         {
-            var query = $"SELECT Id FROM Events WHERE Name = @Name AND Year = @Year";
+            const string query = "SELECT Id FROM Events WHERE Name = @Name AND Year = @Year";
             var parameters = new Dictionary<string, object>
             {
                 { "@Name", name },
@@ -103,7 +104,7 @@ namespace CEX_Olimpiadi.DAO_Classes
 
         public Entity? GetEventById(int id)
         {
-            var query = $"SELECT * FROM Events WHERE Id = @Id";
+            const string query = "SELECT * FROM Events WHERE Id = @Id";
             var parameters = new Dictionary<string, object> { { "@Id", id } };
             var singleResponse = _db.ReadOneDb(query, parameters);
             if (singleResponse == null)

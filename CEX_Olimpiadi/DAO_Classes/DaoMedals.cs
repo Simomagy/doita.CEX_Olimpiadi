@@ -50,7 +50,7 @@ public class DaoMedals : IDAO
             { "@EventId", medal.Event?.Id ?? 0 },
             { "@MedalTier", medal.MedalTier.Replace("'", "''") }
         };
-        var query =
+        const string query =
             $"INSERT INTO Medals (AthleteID, CompetitionId, EventId, MedalTier) VALUES (@AthleteID, @CompetitionId, @EventId, @MedalTier)";
 
         return _db.UpdateDb(query, parameters);
@@ -59,16 +59,17 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public bool UpdateRecord(Entity entity)
     {
+        const string query =
+            "UPDATE Medals SET AthleteID = @AthleteID, CompetitionId = @CompetitionId, EventId = @EventId, MedalTier = @MedalTier WHERE Id = @Id";
         var medal = (Medal)entity;
         var parameters = new Dictionary<string, object>
         {
             { "@AthleteID", medal.Athlete?.Id ?? 0 },
             { "@CompetitionId", medal.Competition?.Id ?? 0 },
             { "@EventId", medal.Event?.Id ?? 0 },
-            { "@MedalTier", medal.MedalTier.Replace("'", "''") }
+            { "@MedalTier", medal.MedalTier.Replace("'", "''") },
+            { "@Id", medal.Id }
         };
-        var query =
-            $"UPDATE Medals SET AthleteID = @AthleteID, CompetitionId = @CompetitionId, EventId = @EventId, MedalTier = @MedalTier WHERE Id = {entity.Id}";
 
         return _db.UpdateDb(query, parameters);
     }
@@ -76,7 +77,7 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public bool DeleteRecord(int recordId)
     {
-        var query = $"DELETE FROM Medals WHERE Id = @Id";
+        const string query = "DELETE FROM Medals WHERE Id = @Id";
         var parameters = new Dictionary<string, object> { { "@Id", recordId } };
         return _db.UpdateDb(query, parameters);
     }
@@ -84,7 +85,7 @@ public class DaoMedals : IDAO
     /// <inheritdoc />
     public Entity? FindRecord(int recordId)
     {
-        var query = $"SELECT * FROM Medals WHERE Id = @Id";
+        const string query = "SELECT * FROM Medals WHERE Id = @Id";
         var parameters = new Dictionary<string, object> { { "@Id", recordId } };
         var singleResponse = _db.ReadOneDb(query, parameters);
         if (singleResponse == null)
@@ -96,7 +97,7 @@ public class DaoMedals : IDAO
 
     public List<Medal> GetAllMedals()
     {
-        var query = @"
+        const string query = @"
                 SELECT 
                     m.Id AS MedalId, m.MedalTier, 
                     a.Id AS AthleteId, a.Name AS AthleteName, a.Surname, a.Dob, a.Country,
@@ -107,7 +108,7 @@ public class DaoMedals : IDAO
                 JOIN Competitions c ON m.CompetitionID = c.Id
                 JOIN Events e ON m.EventID = e.Id";
 
-        List<Medal> medalsRecords = new();
+        List<Medal> medalsRecords = [];
         var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
             return medalsRecords;
@@ -140,7 +141,7 @@ public class DaoMedals : IDAO
 
     public List<Medal> GetAthleteMedals(int athleteId)
     {
-        var query = $@"
+        const string query = @"
         SELECT 
             m.Id AS MedalId, m.MedalTier, 
             a.Id AS AthleteId, a.Name, a.Surname, a.Dob, a.Country,
