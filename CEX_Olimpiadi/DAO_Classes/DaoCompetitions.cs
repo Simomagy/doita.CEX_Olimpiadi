@@ -98,19 +98,19 @@ public class DaoCompetitions : IDAO
         return entity;
     }
 
-    public List<Entity> GetCompetitionsByEventId(int eventId)
+    public List<Competition> GetCompetitionsByEventId(int eventId)
     {
         const string query = "SELECT * FROM Competitions WHERE EventId = @EventId";
         var parameters = new Dictionary<string, object> { { "@EventId", eventId } };
-        List<Entity> competitionsRecords = [];
+        List<Competition> competitionsRecords = [];
         var fullResponse = _db.ReadDb(query, parameters);
         if (fullResponse == null)
             return competitionsRecords;
         foreach (var singleResponse in fullResponse)
         {
-            Entity entity = new Competition();
-            entity.TypeSort(singleResponse);
-            competitionsRecords.Add(entity);
+            var competition = new Competition();
+            competition.TypeSort(singleResponse);
+            competitionsRecords.Add(competition);
         }
 
         return competitionsRecords;

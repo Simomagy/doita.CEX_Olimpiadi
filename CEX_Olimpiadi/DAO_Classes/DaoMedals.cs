@@ -144,7 +144,7 @@ public class DaoMedals : IDAO
         const string query = @"
         SELECT 
             m.Id AS MedalId, m.MedalTier, 
-            a.Id AS AthleteId, a.Name, a.Surname, a.Dob, a.Country,
+            a.Id AS AthleteId, a.Name as athleteName, a.Surname, a.Dob, a.Country,
             c.Id AS CompetitionId, c.Type, c.IsIndoor, c.IsTeamComp, c.Category,
             e.Id AS EventId, e.Name, e.Year, e.Location
         FROM Medals m
