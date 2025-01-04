@@ -53,7 +53,7 @@ while (isRunning)
             Choice1();
             break;
         case 2:
-            //? Visualizza le gare di un evento
+            // Visualizza le gare di un evento
             Choice2();
             break;
         case 3:
@@ -88,7 +88,9 @@ while (isRunning)
 Console.WriteLine("Arrivederci!");
 return;
 
+// -------------------------------------------------------------
 // Medodi per la gestione delle scelte dell'utente
+// -------------------------------------------------------------
 static void Choice1()
 {
     Console.WriteLine("Inserisci il nome dell'atleta: ");
@@ -109,10 +111,8 @@ static void Choice1()
     var medaglie = DaoMedals.GetInstance().GetAthleteMedals(athleteId);
     Console.WriteLine($"Medaglie vinte da {athlete?.Name} {athlete?.Surname}:");
     foreach (var medaglia in medaglie)
-    {
         Console.WriteLine(
             $"- {medaglia.MedalTier} {medaglia.Competition?.Type}, {medaglia.Event?.Name} {medaglia.Event?.Year}");
-    }
 }
 
 static void Choice2()
@@ -191,10 +191,8 @@ static void Choice4()
         // Recupero le medaglie
         var medals = DaoMedals.GetInstance().GetAthleteMedals(atleta.Id);
         foreach (var medal in medals)
-        {
             Console.WriteLine(
                 $"- {medal.MedalTier} {medal.Competition?.Type}, {medal.Event?.Name} {medal.Event?.Year}");
-        }
     }
 }
 

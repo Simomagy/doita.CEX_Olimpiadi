@@ -23,9 +23,24 @@ namespace CEX_Olimpiadi.Classes;
 /// </summary>
 public class Athlete : Entity
 {
+    /// <summary>
+    ///     Nome dell'atleta
+    /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Cognome dell'atleta
+    /// </summary>
     public string Surname { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Data di nascita dell'atleta
+    /// </summary>
     public DateTime Dob { get; set; }
+
+    /// <summary>
+    ///     Nazione di appartenenza dell'atleta
+    /// </summary>
     public string Country { get; set; } = string.Empty;
 
     /// <summary>

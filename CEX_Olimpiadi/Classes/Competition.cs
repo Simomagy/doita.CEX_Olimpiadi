@@ -23,10 +23,29 @@ namespace CEX_Olimpiadi.Classes;
 /// </summary>
 public class Competition : Entity
 {
+    /// <summary>
+    ///     Tipo di competizione
+    /// </summary>
     public string Type { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Indica se la competizione è stata svolta al chiuso
+    /// </summary>
     public bool IsIndoor { get; set; }
+
+    /// <summary>
+    ///     Indica se la competizione è a squadre
+    /// </summary>
     public bool IsTeamComp { get; set; }
+
+    /// <summary>
+    ///     Categoria della competizione
+    /// </summary>
     public string Category { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Id dell'evento a cui appartiene la competizione
+    /// </summary>
     public int EventId { get; set; }
 
     /// <summary>

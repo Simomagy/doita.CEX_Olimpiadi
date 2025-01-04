@@ -16,21 +16,37 @@ using MSSTU.DB.Utility;
 
 #endregion
 
-namespace CEX_Olimpiadi.Classes
+namespace CEX_Olimpiadi.Classes;
+
+/// <summary>
+///     Rappresenta una medaglia vinta da un atleta in una competizione
+/// </summary>
+public class Medal : Entity
 {
     /// <summary>
-    ///     Rappresenta una medaglia vinta da un atleta in una competizione
+    ///     Dati dell'atleta che ha vinto la medaglia
     /// </summary>
-    public class Medal : Entity
-    {
-        public Athlete? Athlete { get; set; }
-        public Competition? Competition { get; set; }
-        public Event? Event { get; set; }
-        public string MedalTier { get; set; } = string.Empty;
+    public Athlete? Athlete { get; set; }
 
-        /// <inheritdoc />
-        public override string ToString() =>
-            $@"
+    /// <summary>
+    ///     Dati della competizione in cui è stata vinta la medaglia
+    /// </summary>
+    public Competition? Competition { get; set; }
+
+    /// <summary>
+    ///     Dati dell'evento in cui è stata vinta la medaglia
+    /// </summary>
+    public Event? Event { get; set; }
+
+    /// <summary>
+    ///     Tipo della medaglia vinta
+    /// </summary>
+    public string MedalTier { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $@"
                   --------------------------------
                   MEDAGLIA {MedalTier}
                   --------------------------------";

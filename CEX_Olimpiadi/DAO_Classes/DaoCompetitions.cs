@@ -19,12 +19,15 @@ using MSSTU.DB.Utility;
 
 namespace CEX_Olimpiadi.DAO_Classes;
 
+/// <summary>
+///     Gestisce le operazioni CRUD per la tabella Competitions del database
+/// </summary>
 public class DaoCompetitions : IDAO
 {
     /// <inheritdoc />
     public List<Entity> GetRecords()
     {
-        const string query = $"SELECT * FROM Competitions";
+        const string query = "SELECT * FROM Competitions";
         List<Entity> competitionsRecords = [];
         var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
@@ -45,7 +48,7 @@ public class DaoCompetitions : IDAO
     {
         var competition = (Competition)entity;
         const string query =
-            $"INSERT INTO Competitions (Type, IsIndoor, IsTeamComp, Category, EventId) VALUES (@Type, @IsIndoor, @IsTeamComp, @Category, @EventId)";
+            "INSERT INTO Competitions (Type, IsIndoor, IsTeamComp, Category, EventId) VALUES (@Type, @IsIndoor, @IsTeamComp, @Category, @EventId)";
 
         var parameters = new Dictionary<string, object>
         {
@@ -63,7 +66,7 @@ public class DaoCompetitions : IDAO
     {
         var competition = (Competition)entity;
         const string query =
-            $"UPDATE Competitions SET Type = @Type, IsIndoor = @IsIndoor, IsTeamComp = @IsTeamComp, Category = @Category, EventId = @EventId WHERE Id = @Id";
+            "UPDATE Competitions SET Type = @Type, IsIndoor = @IsIndoor, IsTeamComp = @IsTeamComp, Category = @Category, EventId = @EventId WHERE Id = @Id";
         var parameters = new Dictionary<string, object>
         {
             { "@Type", competition.Type },
@@ -98,6 +101,11 @@ public class DaoCompetitions : IDAO
         return entity;
     }
 
+    /// <summary>
+    ///     Restituisce tutte le competizioni di un evento dato l'ID
+    /// </summary>
+    /// <param name="eventId">ID dell'evento da ricercare</param>
+    /// <returns>Una lista di oggetti <see cref="Competition" /></returns>
     public List<Competition> GetCompetitionsByEventId(int eventId)
     {
         const string query = "SELECT * FROM Competitions WHERE EventId = @EventId";

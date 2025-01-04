@@ -16,26 +16,38 @@ using MSSTU.DB.Utility;
 
 #endregion
 
-namespace CEX_Olimpiadi.Classes
+namespace CEX_Olimpiadi.Classes;
+
+/// <summary>
+///     Rappresenta un evento sportivo
+/// </summary>
+public class Event : Entity
 {
     /// <summary>
-    ///     Rappresenta un evento sportivo
+    ///     Nome dell'evento
     /// </summary>
-    public class Event : Entity
-    {
-        public string Name { get; set; } = string.Empty;
-        public int Year { get; set; }
-        public string Location { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 
-        /// <summary>
-        ///     Rappresenta i dati di un evento sportivo in formato stringa
-        /// </summary>
-        /// <returns>
-        ///     Una stringa contenente le informazioni dell'evento
-        /// </returns>
-        public override string ToString() =>
-            base.ToString() +
-            $@"
+    /// <summary>
+    ///     Anno in cui si è svolto l'evento
+    /// </summary>
+    public int Year { get; set; }
+
+    /// <summary>
+    ///     Luogo in cui si è svolto l'evento
+    /// </summary>
+    public string Location { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Rappresenta i dati di un evento sportivo in formato stringa
+    /// </summary>
+    /// <returns>
+    ///     Una stringa contenente le informazioni dell'evento
+    /// </returns>
+    public override string ToString()
+    {
+        return base.ToString() +
+               $@"
                   --------------------------------
                   EVENTO
                   --------------------------------

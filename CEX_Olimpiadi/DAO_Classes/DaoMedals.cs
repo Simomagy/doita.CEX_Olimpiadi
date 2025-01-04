@@ -19,12 +19,15 @@ using MSSTU.DB.Utility;
 
 namespace CEX_Olimpiadi.DAO_Classes;
 
+/// <summary>
+///     Gestisce le operazioni CRUD per la tabella Medals del database
+/// </summary>
 public class DaoMedals : IDAO
 {
     /// <inheritdoc />
     public List<Entity> GetRecords()
     {
-        const string query = $"SELECT * FROM Medals";
+        const string query = "SELECT * FROM Medals";
         List<Entity> medalsRecords = [];
         var fullResponse = _db.ReadDb(query);
         if (fullResponse == null)
@@ -51,7 +54,7 @@ public class DaoMedals : IDAO
             { "@MedalTier", medal.MedalTier.Replace("'", "''") }
         };
         const string query =
-            $"INSERT INTO Medals (AthleteID, CompetitionId, EventId, MedalTier) VALUES (@AthleteID, @CompetitionId, @EventId, @MedalTier)";
+            "INSERT INTO Medals (AthleteID, CompetitionId, EventId, MedalTier) VALUES (@AthleteID, @CompetitionId, @EventId, @MedalTier)";
 
         return _db.UpdateDb(query, parameters);
     }
@@ -95,6 +98,14 @@ public class DaoMedals : IDAO
         return entity;
     }
 
+    /// <summary>
+    ///     Restituisce tutte le medaglie presenti nel database
+    /// </summary>
+    /// <remarks>
+    ///     La query seleziona tutte le <see cref="Medal" /> presenti nel database, insieme ai dati dell'<see cref="Athlete" />
+    ///     , della <see cref="Competition" /> e dell'<see cref="Event" />
+    /// </remarks>
+    /// <returns>Una lista di tipo <see cref="Medal" /></returns>
     public List<Medal> GetAllMedals()
     {
         const string query = @"
@@ -139,6 +150,15 @@ public class DaoMedals : IDAO
         return medalsRecords;
     }
 
+    /// <summary>
+    ///     Restituisce le medaglie vinte da un atleta
+    /// </summary>
+    /// <remarks>
+    ///     La query seleziona la <see cref="Medal" /> secondo l'ID dell'atleta dato, insieme ai dati dell'
+    ///     <see cref="Athlete" />, della <see cref="Competition" /> e dell'<see cref="Event" />
+    /// </remarks>
+    /// <param name="athleteId">ID dell'atleta da ricercare</param>
+    /// <returns>Una lista di oggetti <see cref="Medal" /></returns>
     public List<Medal> GetAthleteMedals(int athleteId)
     {
         const string query = @"
